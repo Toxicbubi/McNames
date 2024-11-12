@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McNames</title>
+    <style>
+        body {
+ 
+   
+   
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1F1F1F;
+        }
+        h1 {
+            font-size: 2em;
+            background: linear-gradient(90deg, blue, red); /* Farbverlauf von Blau zu Rot */
+            -webkit-background-clip: text; /* Hintergrund nur auf den Text anwenden */
+            color: transparent; /* Text transparent machen, damit der Hintergrund sichtbar wird */
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            max-width: 400px;
+            width: 100%;
+        }
+        .input-field {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+            width: 80%;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .player-info, .player-skin {
+            margin-top: 20px;
+        }
+        .player-skin img {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minecraft-Spieler suchen</h1>
+    <div class="container">
+        <input type="text" id="username" class="input-field" placeholder="Spielernamen eingeben">
+        <button class="button" onclick="fetchPlayerInfo()">Suchen</button>
+        <div class="player-info" id="player-info"></div>
+        <div class="player-skin" id="player-skin"></div>
+    </div>
+    <script>
+        async function fetchPlayerInfo() {
+            const username = document.getElementById("username").value.trim();
+            if (!username) {
+                alert("Bitte einen Spielernamen eingeben!");
+                return;
+            }
+            try {
+                // UUID des Spielers von Mojang-API abrufen
+                const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+                
+                if (!response.ok) {
+                    throw new Error('Spieler nicht gefunden');
+                }
+                
+                const playerData = await response.json();
+                
+                // Spielername und Spieler-ID anzeigen
+                document.getElementById("player-info").innerHTML = `
+                    <p>Spielername: ${playerData.name}</p>
+                    <p>Spieler-ID: ${playerData.id}</p>
+                `;
+                
+                // Skin anzeigen
+                const skinUrl = `https://crafatar.com/renders/body/${playerData.id}?overlay`;
+                document.getElementById("player-skin").innerHTML = `
+                    <h3>Spieler-Skin:</h3>
+                    <img src="${skinUrl}" alt="Skin von ${playerData.name}" width="150">
+                `;
+            } catch (error) {
+                document.getElementById("player-info").innerHTML = `<p>Spieler nicht gefunden!</p>`;
+                document.getElementById("player-skin").innerHTML = "";
+            }
+        }
+    </script>
+</body>
+</html>
